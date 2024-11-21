@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+public class PlayerMovement : MonoBehaviour
+{
+    public float speed = 5.0f;
+    public float gravity = -9.81f;
+    public Transform cameraTransform;
+
+    private CharacterController characterController;
+    private Vector3 direction;
+
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+         cameraTransform =  Camera.main.transform;
+    }
+
+    void Update()
+    {
+        // Captura o input de movimento
+        float horizontal = Input.GetAxis("Horizontal"); // A e D ou seta para esquerda/direita
+        float vertical = Input.GetAxis("Vertical");     // W e S ou seta para cima/baixo
+
+        // Calcula a direção de movimento relativa à câmera 
+        Vector3 direction = new Vector3(horizontal,0, vertical);
+        direction = cameraTransform.TransformDirection(direction);
+        direction.y = 0; // Mantém a movimentação no plano XZ
+
+    
+        characterController.Move(direction * speed * Time.deltaTime); // movimento
+        characterController.Move(new Vector3(0, gravity,0) * Time.deltaTime);
+
+
+        // Rotaciona o jogador na direção do movimento
+        if (direction != Vector3.zero)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction) , Time.deltaTime * 10);
+        }
+    }
+}
